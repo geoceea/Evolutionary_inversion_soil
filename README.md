@@ -68,25 +68,25 @@ The following notebooks are provided:
 
 Represents the reference model with normal density variation across layers.
 
-<img src="OUTPUT/MWC/FIGURES/block_soil_model.gif" width="400" align="center">
+<img src="Models/MWC.gif" width="400" align="center">
 
 - #### **MCP1 Model:** *Compaction in the first layer*
 
 Characterized by a higher density in the first layer.
 
-<img src="OUTPUT/MCP1/FIGURES/block_soil_model.gif" width="400" align="center">
+<img src="Models/MCP1.gif" width="400" align="center">
 
 - #### **MCP2_1 Model:** *Compaction in the second layer (with lateral variation)*
 
 Features lateral density variations in the second layer.
 
-<img src="OUTPUT/MCP2_1/FIGURES/block_soil_model.gif" width="400" align="center">
+<img src="Models/MCP2_1.gif" width="400" align="center">
 
 - #### **MCP2_2 Model:** *Compaction in the second layer (without lateral variation)*
 
 Uniform density in the second layer with no lateral variation.
 
-<img src="OUTPUT/MCP2_2/FIGURES/block_soil_model.gif" width="400" align="center">
+<img src="Models/MCP2_2.gif" width="400" align="center">
 
 #### These animations illustrate the 3D soil models used in the inversions.
 
