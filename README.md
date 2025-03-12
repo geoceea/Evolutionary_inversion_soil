@@ -1,6 +1,6 @@
 # 🧬 Inversion of Surface Wave Dispersion Using Evolutionary Algorithms 🧬
 
-This repository contains reproducible material for the study *"Inversion of Surface Wave Dispersion Using Evolutionary Algorithms for the Characterization of Compacted Soil"* by **Marcos Augusto Lima da Luz, Rosana Maria do Nascimento Luz, Diogo Luiz de Oliveira Coelho, and Marcos Alberto Rodrigues Vasconcelos**, submitted to *Computers & Geosciences*.
+This repository contains reproducible material for the study *"Inversion of Surface Wave Dispersion Using Evolutionary Algorithms for the Characterization of Compacted Soil"* by **Marcos Augusto Lima da Luz, Marcos Alberto Rodrigues Vasconcelos, Diogo Luiz de Oliveira Coelho, and Rosana Maria do Nascimento Luz**, submitted to *Computers & Geosciences*.
 
 The provided scripts and notebooks demonstrate the generation and inversion of surface wave dispersion data, enabling the retrieval of the S-wave velocity profile as a function of depth using Evolutionary Algorithms.
 
