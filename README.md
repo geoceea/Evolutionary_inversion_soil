@@ -92,7 +92,7 @@ Uniform density in the second layer with no lateral variation.
 
 ## 📝 License 📝 
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the BSD-3 License. See the `LICENSE` file for details.
 
 ## 📚 References 📚  
 
