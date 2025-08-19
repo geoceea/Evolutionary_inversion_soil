@@ -3,8 +3,15 @@
 ## Dispersion curve estimative 
 
 import numpy as np
+import pandas as pd
+import random
+from itertools import accumulate
+
 from CODES.modeling import calculate_parameters_from_vs
 from CODES.dispersion_curves import estimate_disp_from_velocity_model
+
+from parameters_py.config import (
+					MODEL_NAME,FOLDER_OUTPUT,MAX_TOTAL,DEPTH_INTERVAL)
 
 def create_velocity_model_from_profile_vs(model_profile):
     '''
@@ -34,46 +41,56 @@ def create_velocity_model_from_profile_vs(model_profile):
     
 # ---------------------------------------------------------------------
 
-def create_layers(min_esp, max_esp,max_total=0.002):
-    """
-    Generates a list of random layer thicknesses within specified bounds.
-
-    This function creates a list of layer thicknesses by drawing random values 
-    from a uniform distribution between `min_esp` and `max_esp` until the total 
-    thickness reaches or exceeds `max_total`.
+def create_layers(min_thick_layer, max_thick_layer,max_total=2.0):
+    '''
+    This function generates a list of random layer thicknesses that sum exactly to a specified total (`max_total`). 
+    Each layer thickness is randomly drawn from a uniform distribution between `min_esp` and `max_esp`, 
+    ensuring that all layers meet the minimum thickness requirement (`min_esp`). 
+    The final layer is adjusted so that the total thickness precisely matches `max_total`.
 
     Parameters:
     -----------
-    min_esp : float
-        Minimum thickness of an individual layer (km).
-    max_esp : float
-        Maximum thickness of an individual layer  (km).
-    max_total : float, optional (default=0.002 kilometers)
-        Maximum total thickness of all layers (km).
+    min_thick_layer : float
+        Minimum thickness of an individual layer (m).
+    max_thick_layer : float
+        Maximum thickness of an individual layer  (m).
+    max_total : float, optional (default=2 meters)
+        Maximum total thickness of all layers (m).
 
     Returns:
     --------
     thick_lst : list of float
-        A list of layer thicknesses, each rounded to four decimal places.
-    """
+        A list of layer thicknesses.
+
+    '''
+
+    values = []
+    current_sum = 0.0
     
-    thick_lst = []
-    total = 0.0
+    while True:
+        remaining = round(max_total - current_sum, 2)
+        
+        possible_values = [v for v in [min_thick_layer+tk for tk in np.arange(0.01,max_thick_layer-min_thick_layer,0.01)] if max_thick_layer <= remaining]
 
-    while total < max_total:
-        esp = random.uniform(min_esp, max_esp)
-        thick_lst.append(round(esp, 4)) 
-        total += esp
-        if total >= max_total:
+        if not possible_values:
+            values.append(remaining)
             break
+        
+        else:
+            choice = random.choice(possible_values)
+            values.append(round(choice,2))
+            current_sum = round(current_sum + choice, 1)        
+            
+            if current_sum == max_total:
+                break
 
-    return thick_lst
+    return values
 
 # ------------------------------------------------------------------
 
-def uniform(low_thick, up_thick,low_vels,up_vels):
+def uniform(low_thick, up_thick,max_total,low_vels,up_vels):
     """
-    Generates a random velocity model with layer thicknesses (km) and Vs values (m/s).
+    Generates a random velocity model with layer thicknesses (m) and Vs values (m/s).
 
     This function first creates a set of random layer thicknesses using 
     `create_layers()`, then assigns shear wave velocities (Vs) to each layer 
@@ -82,9 +99,9 @@ def uniform(low_thick, up_thick,low_vels,up_vels):
     Parameters:
     -----------
     low_thick : float
-        Lower bound for layer thickness (km).
+        Lower bound for layer thickness (m).
     up_thick : float
-        Upper bound for layer thickness (km).
+        Upper bound for layer thickness (m).
     low_vels : float
         Lower bound for Vs values (m/s).
     up_vels : float
@@ -107,16 +124,15 @@ def uniform(low_thick, up_thick,low_vels,up_vels):
         toolbox.register("model", uniform, lower_thick, upper_thick, lower_vs, upper_vs)
     """
     
-    thickness_lst = create_layers(low_thick,up_thick)
+    thickness_lst = create_layers(low_thick,up_thick,max_total)
     
     vs_lst = []
     for s in range(1,len(thickness_lst)+1):
         if s == 1:
-            vs_lst.append(np.random.uniform(low_vels,up_vels))
+            vs_lst.append(round(np.random.uniform(low_vels,up_vels)))
         else:
-            vs_lst.append(np.random.uniform(low_vels*(s),up_vels*(s)))
+            vs_lst.append(round(np.random.uniform(low_vels*(s),up_vels*(s))))
     return [thickness_lst,vs_lst]
-
 # ------------------------------------------------------------------
 
 def inversion_objective(individual, true_disp,number_samples=100):
@@ -296,3 +312,124 @@ def configure_deap(estimated_disp,lower_thick,upper_thick,lower_vs,upper_vs):
     toolbox.register("select", tools.selTournament, tournsize=3)
     
     return toolbox
+
+# ------------------------------------------------------------------
+
+def process_depths(thick_row,max_total_depth=MAX_TOTAL):
+    """
+    Process depth list based on thickness values with special handling for MAX_TOTAL threshold.
+    
+    Parameters:
+    -----------
+    thickness_list : list or array-like
+        List of layer thickness values from inversion results
+    
+    Returns:
+    --------
+    list
+        Processed depth list with special handling for MAX_TOTAL threshold
+    """
+    # Calculate cumulative depths (negative values)
+    depths = [0] + [-j for j in list(accumulate(thick_row))]
+
+    return depths
+
+# ------------------------------------------------------------------
+
+def homogenize_depth_grid(row,depth_interval=DEPTH_INTERVAL,max_depth=MAX_TOTAL):
+   
+    # -----------------------------------------------
+    # Homogenize Vs into a fixed depth grid between
+    # 0 and MAX_TOTAL km at a fixed depth interval.
+    # Using the layer thicknesses in 'thick'.
+    # Define 1D grid (fixed between 0 and max_depth (m), step DEPTH_INTERVAL (m))
+
+    depths = process_depths(row['thick'])            
+    
+    depths_fine = np.arange(0, -max_depth + depth_interval, depth_interval)  # from 0 to -2
+    
+    # Fill Vs values within each interval of the fixed grid
+    vels_fine = np.zeros_like(depths_fine)          
+
+    for j in range(len(depths) - 1):
+        mask = (depths_fine >= depths[j+1]) & (depths_fine <= depths[j])
+        vels_fine[mask] = row['Vs'][j]
+
+    # Return as a Series
+    return pd.Series({
+        'depth_interval': depths_fine.tolist(),
+        'Vs_interval': vels_fine.tolist()
+    })
+
+# ------------------------------------------------------------------------------------
+
+def bootstrap_hof_uncertainty(df_input, n_iterations=500, ci_percentiles=[2.5, 97.5]):
+    """
+    Perform bootstrap uncertainty analysis on Hall of Fame (HOF) solutions each 
+    station.
+    
+    Parameters:
+    -----------
+    df : dataframe
+        Collection of best solutions from evolutionary algorithm (Hall of Fame)
+    n_iterations : int, optional
+        Number of bootstrap resamples (default: 1000)
+    ci_percentiles : list, optional
+        Percentiles for confidence intervals (default: [2.5, 97.5] for 95% CI)
+    
+    Returns:
+    --------
+    Dataframe
+        Dataframe containing bootstrap statistics and confidence intervals
+    """
+  
+    # Initialize storage for bootstrap statistics]
+    station_df = df_input['station'].values[0]
+    hof_vs = df_input['Vs_interval'].values
+    hof_depth = df_input['depth_interval'].values
+    n_hof = len(hof_vs)
+
+    bootstrap_vs_means = []
+    bootstrap_depth_means = []
+
+    # Bootstrap resampling process
+    for i in range(n_iterations):
+       
+        # Resample with replacement
+        sample = np.random.choice(range(n_hof), size=n_hof, replace=True)
+
+        bootstrap_vs = [hof_vs[sl] for sl in sample]
+        bootstrap_depth = [hof_depth[sl] for sl in sample]
+       
+        # Calculate and store mean of resampled solutions
+        bootstrap_vs_means.append(np.mean(bootstrap_vs, axis=0))
+        bootstrap_depth_means.append(np.mean(bootstrap_depth, axis=0))
+    
+    # Calculate confidence intervals
+    lower_vs, upper_vs = np.percentile(bootstrap_vs_means, ci_percentiles, axis=0)
+    lower_depth, upper_depth = np.percentile(bootstrap_depth_means, ci_percentiles, axis=0)
+    
+    # Calculate statistics
+    overall_mean_vs = np.mean(bootstrap_vs_means, axis=0)
+    std_dev_vs = np.std(bootstrap_vs_means, axis=0)
+
+    overall_mean_depth = np.mean(bootstrap_depth_means, axis=0)
+    std_dev_depth = np.std(bootstrap_depth_means, axis=0)
+    
+    dic_bootstrap = {
+        'station': station_df,
+        'mean_vs': overall_mean_vs,
+        'std_vs': std_dev_vs,
+        'ci_lower_vs': lower_vs,
+        'ci_upper_vs': upper_vs,
+        'bootstrap_distribution_vs': bootstrap_vs_means,
+        'mean_depth': overall_mean_depth,
+        'std_depth': std_dev_depth,
+        'ci_lower_depth': lower_depth,
+        'ci_upper_depth': upper_depth,
+        'bootstrap_distribution_depth': bootstrap_depth_means
+    }
+
+    return dic_bootstrap
+
+# ------------------------------------------------------------------------------------

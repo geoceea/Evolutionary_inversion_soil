@@ -1,6 +1,6 @@
 # 🧬 Inversion of Surface Wave Dispersion Using Evolutionary Algorithms 🧬
 
-This repository contains reproducible material for the study *"Inversion of Surface Wave Dispersion Using Evolutionary Algorithms for the Characterization of Compacted Soil"* by **Marcos Augusto Lima da Luz, Marcos Alberto Rodrigues Vasconcelos, Diogo Luiz de Oliveira Coelho, and Rosana Maria do Nascimento Luz**, submitted to *Computers & Geosciences*.
+This repository contains reproducible material for the study *"Inversion of Surface Wave Dispersion Using Evolutionary Algorithms for the Characterization of Compacted Soil"* by **Marcos Augusto Lima da Luz, Marcos Alberto Rodrigues Vasconcelos, Diogo Luiz de Oliveira Coelho, and Rosana Maria do Nascimento Luz**, submitted to *Applied Computing and Geosciences*.
 
 The provided scripts and notebooks demonstrate the generation and inversion of surface wave dispersion data, enabling the retrieval of the S-wave velocity profile as a function of depth using Evolutionary Algorithms.
 
@@ -8,24 +8,26 @@ The provided scripts and notebooks demonstrate the generation and inversion of s
 
 The following libraries are used in this project:
 
-- [NumPy](https://numpy.org/): Fundamental package for numerical computing in Python.
-- [Pandas](https://pandas.pydata.org/): Data analysis and manipulation tool.
-- [Matplotlib](https://matplotlib.org/): Visualization library for creating static, animated, and interactive plots.
-- [tqdm](https://github.com/tqdm/tqdm): Library for displaying progress bars in loops and scripts.
-- [Verde](https://www.fatiando.org/verde/latest/): Processing and interpolation of spatial data.
-- [GemPy](https://www.gempy.org/): 3D structural geological modeling library.
-- [GemGIS](https://github.com/cgre-aachen/gemgis): Geospatial processing library.
-- [PyVista](https://pyvista.org/): 3D visualization and mesh analysis library.
-- [DEAP](https://deap.readthedocs.io/): Evolutionary algorithm framework for optimization tasks.
-- [Disba](https://github.com/keurfonluu/disba): Surface wave dispersion analysis.
+- [NumPy (2.2.6)](https://numpy.org/): Fundamental package for numerical computing in Python.
+- [Pandas (2.3.1)](https://pandas.pydata.org/): Data analysis and manipulation tool.
+- [Matplotlib (3.10.0)](https://matplotlib.org/): Visualization library for creating static, animated, and interactive plots.
+- [tqdm (4.67.1)](https://github.com/tqdm/tqdm): Library for displaying progress bars in loops and scripts.
+- [Verde (1.8.1)](https://www.fatiando.org/verde/latest/): Processing and interpolation of spatial data.
+- [GemPy (2025.1.0)](https://www.gempy.org/): 3D structural geological modeling library.
+- [GemGIS (1.1.8)](https://github.com/cgre-aachen/gemgis): Geospatial processing library.
+- [PyVista (0.45.2)](https://pyvista.org/): 3D visualization and mesh analysis library.
+- [DEAP (1.4.3)](https://deap.readthedocs.io/): Evolutionary algorithm framework for optimization tasks.
+- [Disba (0.7.0)](https://github.com/keurfonluu/disba): Surface wave dispersion analysis.
 
 ## 📀 Installation 📀
 
-To use the provided notebooks, install the required dependencies using pip:
+This project provides an `environment.yml` file to ensure reproducibility of results.  
+To set up the environment, install [Conda](https://docs.conda.io/) and run:
 
 ```bash
-pip install numpy pandas matplotlib scipy tqdm gempy pyvista vtk deap disba gemgis verde
-```
+conda env create -f environment.yml
+conda activate Evolutionary_inversion_soil
+
 
 ## 🏗️ Project structure 🏗️
 This repository is organized as follows:
@@ -111,6 +113,7 @@ All experiments were conducted on two different setups running **Debian GNU/Linu
 
 - 💻 **AMD Ryzen 7 5700U** with **10 GB RAM**  
 - 💻 **Intel® Core™ Ultra 9** with **64 GB RAM**  
+- 💻 **13th Gen Intel® Core™ i9-13900KF** with **128 GB RAM**  
 
 📣 **Multiprocessing is implemented.**  
 

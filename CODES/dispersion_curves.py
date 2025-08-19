@@ -136,3 +136,23 @@ def estimate_disp_from_velocity_model(vel_mol,number_samples=100):
     cpr = pdisp(t, mode=0, wave="rayleigh")
 
     return cpr    
+
+# -----------------------------------------------------------
+
+def compute_dispersion(row):
+    # Extract Vs and thickness from the row
+    Vs = row['mean_vs']
+    thick = row['mean_depth']
+    
+    # Create velocity model and estimate dispersion curve
+    simulated_velocity_model = create_velocity_model_from_profile_vs([thick, Vs])
+    simulated_cpr = estimate_disp_from_velocity_model(simulated_velocity_model)
+    
+    # Extract simulated values
+    simulated_dispersion = simulated_cpr.velocity * 1000  # Convert km/s to m/s
+    simulated_frequency = 1/simulated_cpr.period         # Already in seconds (assuming)
+    
+    return pd.Series({
+        'simulated_dispersion': simulated_dispersion,
+        'simulated_frequency': simulated_frequency
+    })

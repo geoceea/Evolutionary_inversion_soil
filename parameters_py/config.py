@@ -130,11 +130,11 @@ MUTPB = config.getfloat('gene', 'MUTPB')
 
 ## ---------------------------------------
 ## The probability of performing crossover (default=0.7)
-CXBB = config.getfloat('gene', 'CXBB')     
+CXPB = config.getfloat('gene', 'CXPB')     
 
 ## ---------------------------------------
 ## Starting best solution estimation:
-HOF = config.getint('gene', 'HOF')    
+HOF_NUM = config.getint('gene', 'HOF_NUM')    
 
 ## ---------------------
 ## Number of generations:
@@ -147,6 +147,10 @@ POPULATION = config.getint('gene', 'POPULATION')
 ## --------------------
 ## Number of inversions:
 N_INV = config.getint('gene', 'N_INV')
+
+## ----------------------------------------
+## Depth grid step size for homogenizing Vs (default = -0.1 m):
+DEPTH_INTERVAL = config.getfloat('gene', 'DEPTH_INTERVAL') 
 
 ## ---------------
 ## MULTIPROCESSING

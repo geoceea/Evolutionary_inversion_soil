@@ -3,9 +3,15 @@
 ## Dispersion curve estimative 
 
 import numpy as np
+import pandas as pd
 import random
+from itertools import accumulate
+
 from CODES.modeling import calculate_parameters_from_vs
 from CODES.dispersion_curves import estimate_disp_from_velocity_model
+
+from parameters_py.config import (
+					MODEL_NAME,FOLDER_OUTPUT,MAX_TOTAL,DEPTH_INTERVAL)
 
 def create_velocity_model_from_profile_vs(model_profile):
     '''
@@ -306,3 +312,124 @@ def configure_deap(estimated_disp,lower_thick,upper_thick,lower_vs,upper_vs):
     toolbox.register("select", tools.selTournament, tournsize=3)
     
     return toolbox
+
+# ------------------------------------------------------------------
+
+def process_depths(thick_row,max_total_depth=MAX_TOTAL):
+    """
+    Process depth list based on thickness values with special handling for MAX_TOTAL threshold.
+    
+    Parameters:
+    -----------
+    thickness_list : list or array-like
+        List of layer thickness values from inversion results
+    
+    Returns:
+    --------
+    list
+        Processed depth list with special handling for MAX_TOTAL threshold
+    """
+    # Calculate cumulative depths (negative values)
+    depths = [0] + [-j for j in list(accumulate(thick_row))]
+
+    return depths
+
+# ------------------------------------------------------------------
+
+def homogenize_depth_grid(row,depth_interval=DEPTH_INTERVAL,max_depth=MAX_TOTAL):
+   
+    # -----------------------------------------------
+    # Homogenize Vs into a fixed depth grid between
+    # 0 and MAX_TOTAL km at a fixed depth interval.
+    # Using the layer thicknesses in 'thick'.
+    # Define 1D grid (fixed between 0 and max_depth (m), step DEPTH_INTERVAL (m))
+
+    depths = process_depths(row['thick'])            
+    
+    depths_fine = np.arange(0, -max_depth + depth_interval, depth_interval)  # from 0 to -2
+    
+    # Fill Vs values within each interval of the fixed grid
+    vels_fine = np.zeros_like(depths_fine)          
+
+    for j in range(len(depths) - 1):
+        mask = (depths_fine >= depths[j+1]) & (depths_fine <= depths[j])
+        vels_fine[mask] = row['Vs'][j]
+
+    # Return as a Series
+    return pd.Series({
+        'depth_interval': depths_fine.tolist(),
+        'Vs_interval': vels_fine.tolist()
+    })
+
+# ------------------------------------------------------------------------------------
+
+def bootstrap_hof_uncertainty(df_input, n_iterations=500, ci_percentiles=[2.5, 97.5]):
+    """
+    Perform bootstrap uncertainty analysis on Hall of Fame (HOF) solutions each 
+    station.
+    
+    Parameters:
+    -----------
+    df : dataframe
+        Collection of best solutions from evolutionary algorithm (Hall of Fame)
+    n_iterations : int, optional
+        Number of bootstrap resamples (default: 1000)
+    ci_percentiles : list, optional
+        Percentiles for confidence intervals (default: [2.5, 97.5] for 95% CI)
+    
+    Returns:
+    --------
+    Dataframe
+        Dataframe containing bootstrap statistics and confidence intervals
+    """
+  
+    # Initialize storage for bootstrap statistics]
+    station_df = df_input['station'].values[0]
+    hof_vs = df_input['Vs_interval'].values
+    hof_depth = df_input['depth_interval'].values
+    n_hof = len(hof_vs)
+
+    bootstrap_vs_means = []
+    bootstrap_depth_means = []
+
+    # Bootstrap resampling process
+    for i in range(n_iterations):
+       
+        # Resample with replacement
+        sample = np.random.choice(range(n_hof), size=n_hof, replace=True)
+
+        bootstrap_vs = [hof_vs[sl] for sl in sample]
+        bootstrap_depth = [hof_depth[sl] for sl in sample]
+       
+        # Calculate and store mean of resampled solutions
+        bootstrap_vs_means.append(np.mean(bootstrap_vs, axis=0))
+        bootstrap_depth_means.append(np.mean(bootstrap_depth, axis=0))
+    
+    # Calculate confidence intervals
+    lower_vs, upper_vs = np.percentile(bootstrap_vs_means, ci_percentiles, axis=0)
+    lower_depth, upper_depth = np.percentile(bootstrap_depth_means, ci_percentiles, axis=0)
+    
+    # Calculate statistics
+    overall_mean_vs = np.mean(bootstrap_vs_means, axis=0)
+    std_dev_vs = np.std(bootstrap_vs_means, axis=0)
+
+    overall_mean_depth = np.mean(bootstrap_depth_means, axis=0)
+    std_dev_depth = np.std(bootstrap_depth_means, axis=0)
+    
+    dic_bootstrap = {
+        'station': station_df,
+        'mean_vs': overall_mean_vs,
+        'std_vs': std_dev_vs,
+        'ci_lower_vs': lower_vs,
+        'ci_upper_vs': upper_vs,
+        'bootstrap_distribution_vs': bootstrap_vs_means,
+        'mean_depth': overall_mean_depth,
+        'std_depth': std_dev_depth,
+        'ci_lower_depth': lower_depth,
+        'ci_upper_depth': upper_depth,
+        'bootstrap_distribution_depth': bootstrap_depth_means
+    }
+
+    return dic_bootstrap
+
+# ------------------------------------------------------------------------------------
