@@ -222,7 +222,7 @@ def mutate_gaussian(ind, mutpb=0.1):
     Applies Gaussian mutation to the individual's values (layer thickness and velocity), 
     ensuring the structure of each sublist remains unchanged.
 
-    Parameters:
+    Parameters:_bootstrap
     -----------
     ind : list
         The individual consisting of two sublists: thicknesses and velocities.
@@ -330,7 +330,7 @@ def process_depths(thick_row,max_total_depth=MAX_TOTAL):
         Processed depth list with special handling for MAX_TOTAL threshold
     """
     # Calculate cumulative depths (negative values)
-    depths = [0] + [-j for j in list(accumulate(thick_row))]
+    depths = [0] + [j for j in list(accumulate(thick_row))]
 
     return depths
 
@@ -346,14 +346,16 @@ def homogenize_depth_grid(row,depth_interval=DEPTH_INTERVAL,max_depth=MAX_TOTAL)
 
     depths = process_depths(row['thick'])            
     
-    depths_fine = np.arange(0, -max_depth + depth_interval, depth_interval)  # from 0 to -2
+    depths_fine = np.arange(0, max_depth + depth_interval, depth_interval)  # from 0 to -2
     
     # Fill Vs values within each interval of the fixed grid
     vels_fine = np.zeros_like(depths_fine)          
 
     for j in range(len(depths) - 1):
-        mask = (depths_fine >= depths[j+1]) & (depths_fine <= depths[j])
+        mask = (depths_fine >= depths[j]) & (depths_fine < depths[j+1])
         vels_fine[mask] = row['Vs'][j]
+
+    vels_fine[vels_fine == 0] = row['Vs'][-1]
 
     # Return as a Series
     return pd.Series({

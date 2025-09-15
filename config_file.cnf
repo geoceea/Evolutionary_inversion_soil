@@ -63,12 +63,12 @@
 ## ------------------------
 ## Name of the model
 
-MODEL_NAME = MCP2-1
+MODEL_NAME = MCP1
 
 ## -----------------------
 ## Directory of the output (Figures and Files)
 
-FOLDER_OUTPUT = /home/enseadamartel/Documents/AGRICULTURE_INVERSION/
+FOLDER_OUTPUT = /media/sysop/14f7ead0-5dcb-4557-a139-55dbb404d11a/diogoloc/dados_posdoc/Projeto_AGRICULTURE_INVERSION/
 
 #======
 [model]
@@ -151,10 +151,10 @@ POPULATION = 5000
 N_INV = 5
 
 ## ----------------------------------------
-## Depth grid step size for homogenizing Vs (default = -0.1 m):
-DEPTH_INTERVAL = -0.3
+## Depth grid step size for homogenizing Vs (default = 0.1 m):
+DEPTH_INTERVAL = 0.1
 
 ## ---------------
 ## MULTIPROCESSING
 
-NUM_PROCESS = 30
+NUM_PROCESS = 12
