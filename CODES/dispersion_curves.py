@@ -4,6 +4,7 @@
 
 import numpy as np
 from disba import PhaseDispersion,EigenFunction,PhaseSensitivity
+import pandas as pd
 
 from CODES.modeling import create_seismic_model,calculate_parameters,calculate_parameters_from_vs
 
@@ -139,10 +140,11 @@ def estimate_disp_from_velocity_model(vel_mol,number_samples=100):
 
 # -----------------------------------------------------------
 
-def compute_dispersion(row):
+def compute_dispersion(row,vs_col='mean_vs',depth_col='mean_depth'):
+    
     # Extract Vs and thickness from the row
-    Vs = row['mean_vs']
-    thick = row['mean_depth']
+    Vs = row[vs_col]
+    thick = row[depth_col]
     
     # Create velocity model and estimate dispersion curve
     simulated_velocity_model = create_velocity_model_from_profile_vs([thick, Vs])

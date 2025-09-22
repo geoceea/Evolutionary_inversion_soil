@@ -53,7 +53,7 @@ The following notebooks are provided:
 1. Clone this repository:
    ```bash
    git clone <repository_url>
-   cd Agriculture_inversion
+   cd Evolutionary_inversion_soil
    ```
 2. Open the Jupyter Notebook environment:
    ```bash
