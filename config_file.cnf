@@ -148,7 +148,7 @@ POPULATION = 10000
 
 ## --------------------
 ## Number of inversions:
-N_INV = 1
+N_INV = 2
 
 ## ----------------------------------------
 ## Depth grid step size for homogenizing Vs (default = 0.1 m):
@@ -156,5 +156,4 @@ DEPTH_INTERVAL = 0.1
 
 ## ---------------
 ## MULTIPROCESSING
-
 NUM_PROCESS = 10
