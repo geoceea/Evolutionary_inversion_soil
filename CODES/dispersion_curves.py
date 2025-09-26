@@ -126,7 +126,7 @@ def estimate_disp_from_velocity_model(vel_mol,number_samples=100,algorithm_str='
 	'''
 
     # Periods must be sorted starting with low periods
-    hz = np.linspace(1, 100.0, number_samples) # Hertz
+    hz = np.linspace(10, 100.0, number_samples) # Hertz
     
     t = 1/hz[::-1] # Hertz to seconds
     

@@ -85,7 +85,7 @@ def create_velocity_model_from_profile_vs(model_profile):
     
 # -----------------------------------------------------------
 
-def estimate_disp_from_velocity_model(vel_mol,number_samples=100):
+def estimate_disp_from_velocity_model(vel_mol,number_samples=100,algorithm_str='dunkin'):
     '''
     Calculate phase velocities for input velocity model.
 
@@ -126,12 +126,12 @@ def estimate_disp_from_velocity_model(vel_mol,number_samples=100):
 	'''
 
     # Periods must be sorted starting with low periods
-    hz = np.linspace(1, 100.0, number_samples) # Hertz
+    hz = np.linspace(10, 100.0, number_samples) # Hertz
     
     t = 1/hz[::-1] # Hertz to seconds
     
     # Fundamental mode corresponds to mode 0
-    pdisp = PhaseDispersion(*vel_mol.T,dc=0.0001)
+    pdisp = PhaseDispersion(*vel_mol.T,dc=0.0001,algorithm=algorithm_str)
     
     # Fundamental mode corresponds to mode 0
     cpr = pdisp(t, mode=0, wave="rayleigh")

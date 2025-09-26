@@ -387,6 +387,7 @@ def bootstrap_hof_uncertainty(df_input, n_iterations=500, ci_percentiles=[2.5, 9
   
     # Initialize storage for bootstrap statistics]
     station_df = df_input['station'].values[0]
+    receptor_df = df_input['receptor'].values[0]
     hof_vs = df_input['Vs_interval'].values
     hof_depth = df_input['depth_interval'].values
     n_hof = len(hof_vs)
@@ -420,6 +421,7 @@ def bootstrap_hof_uncertainty(df_input, n_iterations=500, ci_percentiles=[2.5, 9
     
     dic_bootstrap = {
         'station': station_df,
+        'receptor': receptor_df,
         'mean_vs': overall_mean_vs,
         'std_vs': std_dev_vs,
         'ci_lower_vs': lower_vs,
