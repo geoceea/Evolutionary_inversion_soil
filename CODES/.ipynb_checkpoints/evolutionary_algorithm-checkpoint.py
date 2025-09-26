@@ -164,12 +164,11 @@ def inversion_objective(individual, true_disp,number_samples=100):
       model from the Vs profile and then estimating the Rayleigh wave phase velocities.
     - The misfit formula is:
     
-        misfit = sqrt(sum((xdi - xci)^2 / σi^2) / nf)
+        misfit = sqrt(sum((xdi - xci)^2 / (xdi^2 / nf))
         
       where:
         - xdi: Experimental Rayleigh wave phase velocity at frequency fi
         - xci: Theoretical Rayleigh wave phase velocity for the trial model at fi
-        - σi: Standard deviation of the experimental data at fi
         - nf: Number of frequency samples
     - If an error occurs, the function returns a high misfit value (10).
     """
@@ -182,9 +181,8 @@ def inversion_objective(individual, true_disp,number_samples=100):
         simulated_dispersion = simulated_cpr.velocity*1000
                 
         nf = number_samples 
-        sigma = np.std(true_disp)
     
-        misfit = np.sqrt(np.sum(((true_disp - simulated_dispersion) ** 2) / (sigma ** 2)) / nf)
+        misfit = np.sqrt(np.sum(((true_disp - simulated_dispersion) ** 2) / nf)
 
    
     except:
