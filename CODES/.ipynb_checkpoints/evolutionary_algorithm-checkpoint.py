@@ -182,7 +182,7 @@ def inversion_objective(individual, true_disp,number_samples=100):
                 
         nf = number_samples 
     
-        misfit = np.sqrt(np.sum(((true_disp - simulated_dispersion) ** 2) / nf)
+        misfit = np.sqrt(np.sum(((true_disp - simulated_dispersion) ** 2) / nf))
 
    
     except:
