@@ -68,7 +68,7 @@ MODEL_NAME = MCP2-2
 ## -----------------------
 ## Directory of the output (Figures and Files)
 
-FOLDER_OUTPUT = /home/enseadamartel/Documents/SISMOLOGIA/AGRICULTURE_INVERSION/
+FOLDER_OUTPUT = /media/sysop/14f7ead0-5dcb-4557-a139-55dbb404d11a/diogoloc/dados_posdoc/Projeto_AGRICULTURE_INVERSION/
 
 #======
 [model]
